@@ -1,0 +1,17 @@
+#!/bin/bash
+######################################################################
+# process_music
+# 
+# Usage:
+#     process_music
+######################################################################
+Date=$(eval date +%Y%m%d)
+WorkingDir=~/Music
+ScriptsDir=$HOME/code/scripts
+LogFile=$ScriptsDir/logs/mp3gain-$Date.tsv
+ErrLogFile=$ScriptsDir/logs/mp3gain-$Date.err.log
+if [ ! -w $LogFile ]
+  then
+    touch $LogFile 
+fi
+find $WorkingDir -name *.mp3 -exec mp3gain -r -k -T -o -s r {} \+ > $LogFile 2> $ErrLogFile

@@ -7,7 +7,7 @@
 ######################################################################
 Date=$(eval date +%Y%m%d)
 WorkingDir=~/Music
-ScriptsDir=$HOME/scripts
+ScriptsDir=$HOME/code/scripts
 LogFile=$ScriptsDir/logs/mp3gain-$Date.tsv
 ErrLogFile=$ScriptsDir/logs/mp3gain-$Date.err.log
 if [ ! -w $LogFile ]

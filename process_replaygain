@@ -10,9 +10,5 @@ WorkingDir=~/Music
 ScriptsDir=$HOME/code/scripts
 LogFile=$ScriptsDir/logs/mp3gain-$Date.tsv
 ErrLogFile=$ScriptsDir/logs/mp3gain-$Date.err.log
-if [ ! -w $LogFile ]
-  then
-    touch $LogFile 
-fi
 echo "Processing replaygain for mp3 files in $WorkingDir..."
 find $WorkingDir -name *.mp3 -exec mp3gain -r -k -T -o -s r {} \+ > $LogFile 2> $ErrLogFile

@@ -3,12 +3,34 @@
 # process_music
 # 
 # Usage:
-#     process_music
+#     process_music DIRECTORY OPTS
 ######################################################################
 Date=$(eval date +%Y%m%d)
-WorkingDir=~/Music
+WorkingDir=""
 ScriptsDir=$HOME/code/scripts
 LogFile=$ScriptsDir/logs/mp3gain-$Date.tsv
 ErrLogFile=$ScriptsDir/logs/mp3gain-$Date.err.log
+Options=" -T -k -o"
+while [[ $# > 0 ]]
+do
+  arg="$1"
+  if [[ -d $arg ]]
+  then
+    WorkingDir="$arg"
+  else
+    Options="$Options $arg"
+  fi
+shift
+done
+if ! [[ $Options =~ .*(-a|-r).* ]]
+then
+  echo "Missing required option. Please specify -a or -r."
+  exit 0
+fi
+if [[ $WorkingDir == "" ]]
+then
+  echo "Please specify a directory for processing."
+  exit 0
+fi
 echo "Processing replaygain for mp3 files in $WorkingDir..."
-find $WorkingDir -name *.mp3 -exec mp3gain -r -k -T -o -s r {} \+ > $LogFile 2> $ErrLogFile
+find $WorkingDir -name *.mp3 -exec mp3gain $Options {} \+ > $LogFile 2> $ErrLogFile

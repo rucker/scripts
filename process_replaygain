@@ -25,13 +25,31 @@ done
 if ! [[ $Options =~ .*(-a|-r).* ]]
 then
   echo "Missing required option. Please specify -a or -r."
-  exit 0
+  exit 1
+elif [[ $Options =~ .*-a.* ]] && [[ $Options =~ .*-r.* ]]
+then
+  echo "Invalid options. Please specify -a or -r (not both)."
+  exit 1
 fi
 if [[ $WorkingDir == "" ]]
 then
   echo "Please specify a directory for processing."
-  exit 0
+  exit 1
 fi
 
-echo "Processing replaygain for mp3 files in $WorkingDir..."
-find $WorkingDir -name *.mp3 -exec mp3gain $Options {} \+ >> $LogFile 2>> $ErrLogFile
+process_dir() {
+  echo "Processing replaygain for mp3 files in $1"
+  echo "find $1 -name *.mp3 -exec mp3gain $Options {} \+ >> $LogFile 2>> $ErrLogFile"
+}
+
+if [[ $Options =~ .*-a.* ]]
+then
+  echo "Using album mode for each subdirectory of $WorkingDir"
+  for dir in $(find $WorkingDir -type d)
+  do
+    process_dir $dir
+  done
+else
+  echo "Using track mode for all tracks in $WorkingDir"
+  process_dir $WorkingDir
+fi

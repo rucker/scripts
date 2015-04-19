@@ -16,7 +16,7 @@ do
   arg="$1"
   if [[ -d $arg ]]
   then
-    WorkingDir="$arg"
+    WorkingDir="$(readlink -f $arg)"
   else
     Options="$Options $arg"
   fi
@@ -39,7 +39,7 @@ fi
 
 process_dir() {
   echo "Processing replaygain for mp3 files in $1"
-  echo "find $1 -name *.mp3 -exec mp3gain $Options {} \+ >> $LogFile 2>> $ErrLogFile"
+  find $1 -name *.mp3 -exec mp3gain $Options {} \+ >> $LogFile 2>> $ErrLogFile
 }
 
 if [[ $Options =~ .*-a.* ]]

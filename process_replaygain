@@ -1,9 +1,9 @@
 #!/bin/bash
 ######################################################################
-# process_music
+# process_replaygain
 # 
 # Usage:
-#     process_music DIRECTORY OPTS
+#     process_replaygain DIRECTORY OPTS
 ######################################################################
 Date=$(eval date +%Y%m%d)
 WorkingDir=""
@@ -20,7 +20,7 @@ do
   else
     Options="$Options $arg"
   fi
-shift
+  shift
 done
 if ! [[ $Options =~ .*(-a|-r).* ]]
 then
@@ -32,5 +32,6 @@ then
   echo "Please specify a directory for processing."
   exit 0
 fi
+
 echo "Processing replaygain for mp3 files in $WorkingDir..."
 find $WorkingDir -name *.mp3 -exec mp3gain $Options {} \+ >> $LogFile 2>> $ErrLogFile

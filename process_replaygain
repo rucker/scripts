@@ -7,6 +7,7 @@
 ######################################################################
 Date=$(eval date +%Y%m%d)
 WorkingDir=""
+MusicRootDir=$HOME/Music
 ScriptsDir=$HOME/code/scripts
 LogFile=$ScriptsDir/logs/mp3gain-$Date.tsv
 ErrLogFile=$ScriptsDir/logs/mp3gain-$Date.err.log
@@ -38,17 +39,24 @@ then
 fi
 
 process_dir() {
-  echo "Processing replaygain for mp3 files in $1"
-  find $1 -name *.mp3 -exec mp3gain $Options {} \+ >> $LogFile 2>> $ErrLogFile
+  if [[ $1 != $MusicRootDir ]]
+  then
+    echo "Processing replaygain for mp3 files in $1"
+    find $1 -name *.mp3 -exec mp3gain $Options {} \+ >> $LogFile 2>> $ErrLogFile
+  fi
 }
 
 if [[ $Options =~ .*-a.* ]]
 then
   echo "Using album mode for each subdirectory of $WorkingDir"
-  for dir in $(find $WorkingDir -type d)
+  SAVEIFS=$IFS
+  IFS=$'\n'
+  dirs=($(find $WorkingDir -type d))
+  for (( i=0; i<${#dirs[@]}; i++ ))
   do
-    process_dir $dir
+    process_dir ${dirs[$i]}
   done
+  IFS=$SAVEIFS
 else
   echo "Using track mode for all tracks in $WorkingDir"
   process_dir $WorkingDir

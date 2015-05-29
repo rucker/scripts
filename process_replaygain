@@ -7,11 +7,12 @@
 ######################################################################
 Date=$(eval date +%Y%m%d)
 WorkingDir=""
-MusicRootDir=$HOME/Music
 ScriptsDir=$HOME/code/scripts
 LogFile=$ScriptsDir/logs/mp3gain-$Date.tsv
 ErrLogFile=$ScriptsDir/logs/mp3gain-$Date.err.log
-Options=" -T -k -o"
+ReplaygainOptions="-T -k -o "
+FilenamePattern="*.mp3"
+FindOptions="-type d -print0"
 while [[ $# > 0 ]]
 do
   arg="$1"
@@ -19,15 +20,15 @@ do
   then
     WorkingDir="$(readlink -f $arg)"
   else
-    Options="$Options $arg"
+    ReplaygainOptions=$ReplaygainOptions$arg
   fi
   shift
 done
-if ! [[ $Options =~ .*(-a|-r).* ]]
+if ! [[ $ReplaygainOptions =~ .*(-a|-r).* ]]
 then
   echo "Missing required option. Please specify -a or -r."
   exit 1
-elif [[ $Options =~ .*-a.* ]] && [[ $Options =~ .*-r.* ]]
+elif [[ $ReplaygainOptions =~ .*-a.* ]] && [[ $ReplaygainOptions =~ .*-r.* ]]
 then
   echo "Invalid options. Please specify -a or -r (not both)."
   exit 1
@@ -39,25 +40,22 @@ then
 fi
 
 process_dir() {
-  if [[ $1 != $MusicRootDir ]]
-  then
-    echo "Processing replaygain for mp3 files in $1"
-    find $1 -name *.mp3 -exec mp3gain $Options {} \+ >> $LogFile 2>> $ErrLogFile
+  echo "Processing replaygain for mp3 files in "$@""
+  cd "$@"
+  if ls $FilenamePattern 1> /dev/null 2>&1; then
+    mp3gain $ReplaygainOptions $FilenamePattern >> $LogFile 2>> $ErrLogFile
+  else
+    echo "No matching files in this directory."
   fi
 }
-
-if [[ $Options =~ .*-a.* ]]
+if [[ $ReplaygainOptions =~ .*-a.* ]]
 then
   echo "Using album mode for each subdirectory of $WorkingDir"
-  SAVEIFS=$IFS
-  IFS=$'\n'
-  dirs=($(find $WorkingDir -type d))
-  for (( i=0; i<${#dirs[@]}; i++ ))
+  find $WorkingDir/*/ $FindOptions | while read -d $'\0' -r dir
   do
-    process_dir ${dirs[$i]}
+    process_dir "$dir"
   done
-  IFS=$SAVEIFS
 else
   echo "Using track mode for all tracks in $WorkingDir"
-  process_dir $WorkingDir
+  process_dir "$WorkingDir"
 fi

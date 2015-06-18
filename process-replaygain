@@ -1,9 +1,9 @@
 #!/bin/bash
 ######################################################################
-# process_replaygain
+# process-replaygain
 # 
 # Usage:
-#     process_replaygain DIRECTORY OPTS
+#     process-replaygain DIRECTORY OPTS
 ######################################################################
 date=$(eval date +%Y%m%d)
 workingDir=""

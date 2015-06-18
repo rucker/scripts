@@ -51,7 +51,7 @@ process_dir() {
 if [[ $mp3gainOpts =~ .*-a.* ]]
 then
   echo "Using album mode for each subdirectory of $workingDir"
-  find $workingDir/*/ $findOpts | while read -d $'\0' -r dir
+  find $workingDir/* $findOpts | while read -d $'\0' -r dir
   do
     process_dir "$dir"
   done

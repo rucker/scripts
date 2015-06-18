@@ -5,35 +5,35 @@
 # Usage:
 #     process_replaygain DIRECTORY OPTS
 ######################################################################
-Date=$(eval date +%Y%m%d)
-WorkingDir=""
-ScriptsDir=$HOME/code/scripts
-LogFile=$ScriptsDir/logs/mp3gain-$Date.tsv
-ErrLogFile=$ScriptsDir/logs/mp3gain-$Date.err.log
-ReplaygainOptions="-T -k -o "
-FilenamePattern="*.mp3"
-FindOptions="-type d -print0"
+date=$(eval date +%Y%m%d)
+workingDir=""
+scriptsDir=$HOME/code/scripts
+logFile=$scriptsDir/logs/mp3gain-$date.tsv
+errLogFile=$scriptsDir/logs/mp3gain-$date.err.log
+mp3gainOpts="-T -k -o "
+mp3NamePattern="*.mp3"
+findOpts="-type d -print0"
 while [[ $# > 0 ]]
 do
   arg="$1"
   if [[ -d $arg ]]
   then
-    WorkingDir="$(readlink -f $arg)"
+    workingDir="$(readlink -f $arg)"
   else
-    ReplaygainOptions=$ReplaygainOptions$arg
+    mp3gainOpts=$mp3gainOpts$arg
   fi
   shift
 done
-if ! [[ $ReplaygainOptions =~ .*(-a|-r).* ]]
+if ! [[ $mp3gainOpts =~ .*(-a|-r).* ]]
 then
   echo "Missing required option. Please specify -a or -r."
   exit 1
-elif [[ $ReplaygainOptions =~ .*-a.* ]] && [[ $ReplaygainOptions =~ .*-r.* ]]
+elif [[ $mp3gainOpts =~ .*-a.* ]] && [[ $mp3gainOpts =~ .*-r.* ]]
 then
   echo "Invalid options. Please specify -a or -r (not both)."
   exit 1
 fi
-if [[ $WorkingDir == "" ]]
+if [[ $workingDir == "" ]]
 then
   echo "Please specify a directory for processing."
   exit 1
@@ -42,20 +42,20 @@ fi
 process_dir() {
   echo "Processing replaygain for mp3 files in "$@""
   cd "$@"
-  if ls $FilenamePattern 1> /dev/null 2>&1; then
-    mp3gain $ReplaygainOptions $FilenamePattern >> $LogFile 2>> $ErrLogFile
+  if ls $mp3NamePattern 1> /dev/null 2>&1; then
+    mp3gain $mp3gainOpts $mp3NamePattern >> $logFile 2>> $errLogFile
   else
     echo "No matching files in this directory."
   fi
 }
-if [[ $ReplaygainOptions =~ .*-a.* ]]
+if [[ $mp3gainOpts =~ .*-a.* ]]
 then
-  echo "Using album mode for each subdirectory of $WorkingDir"
-  find $WorkingDir/*/ $FindOptions | while read -d $'\0' -r dir
+  echo "Using album mode for each subdirectory of $workingDir"
+  find $workingDir/*/ $findOpts | while read -d $'\0' -r dir
   do
     process_dir "$dir"
   done
 else
-  echo "Using track mode for all tracks in $WorkingDir"
-  process_dir "$WorkingDir"
+  echo "Using track mode for all tracks in $workingDir"
+  process_dir "$workingDir"
 fi

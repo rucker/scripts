@@ -1,10 +1,7 @@
 #!/bin/bash
-######################################################################
-# process-replaygain
-# 
-# Usage:
-#     process-replaygain DIRECTORY OPTS
-######################################################################
+
+thisScript=$(basename $(readlink -nf $0))
+usage="Usage: $thisScript directory [options]"
 date=$(eval date +%Y%m%d)
 workingDir=""
 scriptsDir=$HOME/code/scripts
@@ -28,18 +25,35 @@ do
   fi
   shift
 done
-if ! [[ $mp3gainOpts =~ .*(-a|-r).* ]]
+
+show_usage() {
+  echo $usage
+  echo "Use -h or --help for full list of options."
+}
+show_full_options() {
+  echo $usage
+  echo "Options:"
+  echo "-a		Album modie (mp3gain). Treat all files in a given directory as tracks from the same album and apply album gain to all of them."
+  echo "-r		Track mode (mp3gain). Apply track leveling to each individual file."
+  echo $'\nEither -a or -r is required, but both cannot be used together.'
+}
+
+if [[ $mp3gainOpts =~ .*(-h|help).* ]]
 then
-  echo "Missing required option. Please specify -a or -r."
+  show_full_options
+  exit 1
+elif ! [[ $mp3gainOpts =~ .*(-a|-r).* ]]
+then
+  show_usage
   exit 1
 elif [[ $mp3gainOpts =~ .*-a.* ]] && [[ $mp3gainOpts =~ .*-r.* ]]
 then
-  echo "Invalid options. Please specify -a or -r (not both)."
+  show_usage
   exit 1
 fi
 if [[ $workingDir == "" ]]
 then
-  echo "Please specify a directory for processing."
+  show_usage
   exit 1
 fi
 

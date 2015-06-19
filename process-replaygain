@@ -8,11 +8,15 @@
 date=$(eval date +%Y%m%d)
 workingDir=""
 scriptsDir=$HOME/code/scripts
-logFile=$scriptsDir/logs/mp3gain-$date.tsv
+mp3LogFile=$scriptsDir/logs/mp3gain-$date.tsv
+flacLogFile=$scriptsDir/logs/metaflac-$date.log
 errLogFile=$scriptsDir/logs/mp3gain-$date.err.log
 mp3gainOpts="-T -k -o "
 mp3NamePattern="*.mp3"
+metaflacOpts="--add-replay-gain"
+flacNamePattern="*.flac"
 findOpts="-type d -print0"
+
 while [[ $# > 0 ]]
 do
   arg="$1"
@@ -43,7 +47,11 @@ process_dir() {
   echo "Processing replaygain for mp3 files in "$@""
   cd "$@"
   if ls $mp3NamePattern 1> /dev/null 2>&1; then
-    mp3gain $mp3gainOpts $mp3NamePattern >> $logFile 2>> $errLogFile
+    mp3gain $mp3gainOpts $mp3NamePattern >> $mp3LogFile 2>> $errLogFile
+  elif ls $flacNamePattern 1> /dev/null 2>&1
+  then
+    metaflac $metaflacOpts $flacNamePattern >> $flacLogFile 2>> $errLogFile
+    metaflac --list $flacNamePattern | grep REPLAYGAIN>> $flacLogFile 2>> $errLogFile
   else
     echo "No matching files in this directory."
   fi
@@ -52,9 +60,10 @@ if [[ $mp3gainOpts =~ .*-a.* ]]
 then
   echo "Using album mode for each subdirectory of $workingDir"
   find $workingDir/* $findOpts | while read -d $'\0' -r dir
-  do
-    process_dir "$dir"
-  done
+    do
+      process_dir "$dir"
+    done
+  process_dir $workingDir
 else
   echo "Using track mode for all tracks in $workingDir"
   process_dir "$workingDir"

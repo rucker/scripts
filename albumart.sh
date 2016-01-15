@@ -1,10 +1,12 @@
 #!/bin/bash
-######################################################################
-# process_albumart
-# 
-# Usage:
-#     process_albumart
-######################################################################
+
+#  albumart.sh - A wrapper for addcover.sh (add logging)
+#  Homepage: https://github.com/rucker/scripts
+#  Author: Rick Ucker 
+#
+# Dependencies:
+# addcover.sh (http://github.com/taq/addcover)
+
 Date=$(eval date +%Y%m%d)
 WorkingDir=~/Music
 LogsDir=~/code/scripts/logs

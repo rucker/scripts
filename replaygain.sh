@@ -1,5 +1,15 @@
 #!/bin/bash
 
+#  replaygain.sh - A wrapper for mp3gain 
+#  Homepage: https://github.com/rucker/scripts
+#  Author: Rick Ucker 
+#
+#  Run this script to add mp3gain values to mp3 files in a directory 
+#  and its subdirectories. Both album mode and track mode are supported.
+#
+# Dependencies:
+# mp3gain (http://mp3gain.sourceforge.net/)
+
 thisScript=$(basename $(readlink -nf $0))
 usage="Usage: $thisScript directory [options]"
 date=$(eval date +%Y%m%d)
@@ -33,7 +43,7 @@ show_usage() {
 show_full_options() {
   echo $usage
   echo "Options:"
-  echo "-a		Album modie (mp3gain). Treat all files in a given directory as tracks from the same album and apply album gain to all of them."
+  echo "-a		Album mode (mp3gain). Treat all files in a given directory as tracks from the same album and apply album gain to all of them."
   echo "-r		Track mode (mp3gain). Apply track leveling to each individual file."
   echo $'\nEither -a or -r is required, but both cannot be used together.'
 }
